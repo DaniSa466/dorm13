@@ -6,14 +6,12 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
-UCLASS()
+class UHealthComponent;
+
+UCLASS(Blueprintable)
 class DORM13_API APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
-public:
-	// Sets default values for this character's properties
-	APlayerCharacter();
 
 private:
 	float axisX = 0.f;
@@ -33,6 +31,7 @@ private:
 	void RecoveryStamina();
 
 protected:
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -40,6 +39,10 @@ protected:
 	void SprintDisabled();
 
 public:	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UHealthComponent* healthComponent;
+	
+	APlayerCharacter();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -49,4 +52,5 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetStamina();
 
+	void Death();
 };

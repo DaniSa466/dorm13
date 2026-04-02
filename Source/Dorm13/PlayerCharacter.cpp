@@ -2,6 +2,7 @@
 
 
 #include "PlayerCharacter.h"
+#include "HealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -9,6 +10,10 @@ APlayerCharacter::APlayerCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	healthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	if (healthComponent)
+		healthComponent->OnDead.AddDynamic(this, &APlayerCharacter::Death);
 
 	GetCharacterMovement()->MaxWalkSpeed = resSpeed;
 }
@@ -125,3 +130,7 @@ float APlayerCharacter::GetStamina()
 	return stamina;
 }
 
+void APlayerCharacter::Death()
+{
+	//
+}
