@@ -18,11 +18,21 @@ public:
 	UInventoryComponent();
 
 protected:
+	int8 maxInventoryCount = 3;
+	TArray<class AAInteractionItem*> inventoryArray;
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
-	TArray<AAInteractionItem*> inventoryArray;
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void AddItemToInventory(AAInteractionItem* itemToAdd);
+	AAInteractionItem* GetItemByIndex(int32 itemIndex);
+	
+	UFUNCTION(BlueprintCallable)
+	int32 GetInventoryLenght();
+	UFUNCTION(BlueprintCallable)
+	int32 GetMaxInventoryLenght();
 };

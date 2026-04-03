@@ -4,9 +4,10 @@
 #include "Dorm13/player/PlayerCharacter.h"
 #include "Dorm13/Components/HealthComponent.h"
 #include "Dorm13/Components/InventoryComponent.h"
-#include "Dorm13/InteractableObjects/InteractionEnvironment.h"
+#include "Dorm13/InteractableObjects/InteractionItem.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -19,11 +20,18 @@ APlayerCharacter::APlayerCharacter()
 
 	flipBookComponent->SetLooping(true);
 
+	inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	healthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 	if (healthComponent)
 		healthComponent->OnDead.AddDynamic(this, &APlayerCharacter::Death);
 
 	GetCharacterMovement()->MaxWalkSpeed = resSpeed;
+
+	if (GetCapsuleComponent())
+	{
+		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnBeginOverlap);
+		GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnEndOverlap);
+	}
 }
 
 void APlayerCharacter::InputAxisX(float value)
@@ -128,9 +136,8 @@ void APlayerCharacter::SprintDisabled()
 
 void APlayerCharacter::TakeItemToInventory()
 {
-	
-	AEnergyDrink* energyDrink;
-	inventory->inventoryArray.Add(energyDrink)
+	if (itemToTake && inventory->GetMaxInventoryLenght() > inventory->GetInventoryLenght())
+		inventory->AddItemToInventory(itemToTake);
 }
 
 // Called every frame
@@ -150,6 +157,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction(TEXT("sprint"), EInputEvent::IE_Pressed, this, &APlayerCharacter::SprintEnabled);
 	PlayerInputComponent->BindAction(TEXT("sprint"), EInputEvent::IE_Released, this, &APlayerCharacter::SprintDisabled);
+	PlayerInputComponent->BindAction(TEXT("takeItem"), EInputEvent::IE_Released, this, &APlayerCharacter::TakeItemToInventory);
 }
 
 float APlayerCharacter::GetStamina()
@@ -168,4 +176,22 @@ void APlayerCharacter::IncreaseStamina(float valueToIncrease)
 void APlayerCharacter::Death()
 {
 	//
+}
+
+void APlayerCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	itemToTake = Cast<AAInteractionItem>(OtherActor);
+}
+
+void APlayerCharacter::OnEndOverlap(UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
+{
+	itemToTake = nullptr;
 }
