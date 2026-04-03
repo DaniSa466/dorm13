@@ -17,6 +17,7 @@ class DORM13_API APlayerCharacter : public APaperCharacter
 	GENERATED_BODY()
 	
 private:
+	UPaperFlipbookComponent* flipBookComponent;
 	float axisX = 0.0f;
 	bool sprint = false;
 	float resSpeed = 300.f;
@@ -34,8 +35,6 @@ private:
 	void RecoveryStamina();
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
-	UPaperFlipbookComponent* flipBookComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
 	UPaperFlipbook* idleAnimation;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")

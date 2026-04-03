@@ -13,8 +13,7 @@ APlayerCharacter::APlayerCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	flipBookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Flipbook"));
-	flipBookComponent->SetupAttachment(RootComponent);
+	flipBookComponent = GetSprite();
 
 	flipBookComponent->SetLooping(true);
 
@@ -32,6 +31,11 @@ void APlayerCharacter::InputAxisX(float value)
 
 void APlayerCharacter::MovementTick(float deltaTime)
 {
+	if (axisX > 0)
+		flipBookComponent->SetWorldRotation(FRotator(0.f, 180.f, 0.f));
+	if (axisX < 0)
+		flipBookComponent->SetWorldRotation(FRotator(0.f, 0.f, 0.f));
+
 	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), axisX);
 
 	if (axisX != 0)
@@ -81,6 +85,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	flipBookComponent->SetWorldRotation(FRotator(0.f, 180.f, 0.f));
 	flipBookComponent->SetFlipbook(idleAnimation);
 }
 
