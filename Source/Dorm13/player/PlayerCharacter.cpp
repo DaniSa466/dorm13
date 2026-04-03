@@ -3,6 +3,8 @@
 
 #include "Dorm13/player/PlayerCharacter.h"
 #include "Dorm13/Components/HealthComponent.h"
+#include "Dorm13/Components/InventoryComponent.h"
+#include "Dorm13/InteractableObjects/InteractionEnvironment.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -124,6 +126,13 @@ void APlayerCharacter::SprintDisabled()
 	}
 }
 
+void APlayerCharacter::TakeItemToInventory()
+{
+	
+	AEnergyDrink* energyDrink;
+	inventory->inventoryArray.Add(energyDrink)
+}
+
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
@@ -146,6 +155,14 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 float APlayerCharacter::GetStamina()
 {
 	return stamina;
+}
+
+void APlayerCharacter::IncreaseStamina(float valueToIncrease)
+{
+	if (stamina + valueToIncrease <= 100)
+		stamina += valueToIncrease;
+	else
+		stamina = 100;
 }
 
 void APlayerCharacter::Death()

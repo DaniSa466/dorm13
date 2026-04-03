@@ -8,9 +8,9 @@
 #include "PaperFlipBook.h"
 #include "PlayerCharacter.generated.h"
 
-/**
- * 
- */
+class UHealthComponent;
+class UInventoryComponent;
+
 UCLASS()
 class DORM13_API APlayerCharacter : public APaperCharacter
 {
@@ -42,15 +42,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
 	UPaperFlipbook* runAnimation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	UInventoryComponent* inventory;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void SprintEnabled();
 	void SprintDisabled();
 
+	void TakeItemToInventory();
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UHealthComponent* healthComponent;
+	UHealthComponent* healthComponent;
 
 	APlayerCharacter();
 	// Called every frame
@@ -61,6 +66,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetStamina();
+	void IncreaseStamina(float valueToIncrease);
 
 	void Death();
 };
