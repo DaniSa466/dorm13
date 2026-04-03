@@ -3,18 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "PaperCharacter.h"
+#include "PaperFlipbookComponent.h"
+#include "PaperFlipBook.h"
 #include "PlayerCharacter.generated.h"
 
-class UHealthComponent;
-
-UCLASS(Blueprintable)
-class DORM13_API APlayerCharacter : public ACharacter
+/**
+ * 
+ */
+UCLASS()
+class DORM13_API APlayerCharacter : public APaperCharacter
 {
 	GENERATED_BODY()
-
+	
 private:
-	float axisX = 0.f;
+	float axisX = 0.0f;
 	bool sprint = false;
 	float resSpeed = 300.f;
 
@@ -31,6 +34,14 @@ private:
 	void RecoveryStamina();
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	UPaperFlipbookComponent* flipBookComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	UPaperFlipbook* idleAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	UPaperFlipbook* walkAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	UPaperFlipbook* runAnimation;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -38,10 +49,10 @@ protected:
 	void SprintEnabled();
 	void SprintDisabled();
 
-public:	
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UHealthComponent* healthComponent;
-	
+
 	APlayerCharacter();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
