@@ -49,7 +49,12 @@ void APlayerCharacter::MovementTick(float deltaTime)
 	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), axisX);
 
 	if (axisX != 0)
-		flipBookComponent->SetFlipbook(walkAnimation);
+	{
+		if (sprint)
+			flipBookComponent->SetFlipbook(runAnimation);
+		else
+			flipBookComponent->SetFlipbook(walkAnimation);
+	}
 	else
 		flipBookComponent->SetFlipbook(idleAnimation);
 }
@@ -137,7 +142,12 @@ void APlayerCharacter::SprintDisabled()
 void APlayerCharacter::TakeItemToInventory()
 {
 	if (itemToTake && inventory->GetMaxInventoryLenght() > inventory->GetInventoryLenght())
+	{
+		if (AEnergyDrink* energyDrink = Cast<AEnergyDrink>(itemToTake))
+			energyDrink->SetCharPointer(this);
 		inventory->AddItemToInventory(itemToTake);
+		itemToTake->Destroy();
+	}
 }
 
 // Called every frame
@@ -158,6 +168,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("sprint"), EInputEvent::IE_Pressed, this, &APlayerCharacter::SprintEnabled);
 	PlayerInputComponent->BindAction(TEXT("sprint"), EInputEvent::IE_Released, this, &APlayerCharacter::SprintDisabled);
 	PlayerInputComponent->BindAction(TEXT("takeItem"), EInputEvent::IE_Released, this, &APlayerCharacter::TakeItemToInventory);
+	PlayerInputComponent->BindAction(TEXT("useItem"), EInputEvent::IE_Released, this, &APlayerCharacter::UseItem);
 }
 
 float APlayerCharacter::GetStamina()
@@ -171,6 +182,8 @@ void APlayerCharacter::IncreaseStamina(float valueToIncrease)
 		stamina += valueToIncrease;
 	else
 		stamina = 100;
+
+	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::IncreaseStamina"));
 }
 
 void APlayerCharacter::Death()
@@ -194,4 +207,12 @@ void APlayerCharacter::OnEndOverlap(UPrimitiveComponent* OverlappedComponent,
 	int32 OtherBodyIndex)
 {
 	itemToTake = nullptr;
+}
+
+void APlayerCharacter::UseItem()
+{
+	AAInteractionItem* itemToUse;
+	itemToUse = inventory->GetItemByIndex(currentItemIndex);
+
+	itemToUse->Execute();
 }

@@ -47,6 +47,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	class UInventoryComponent* inventory;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+	int32 currentItemIndex = 0;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -85,4 +87,7 @@ public:
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
+
+	UFUNCTION(BlueprintCallable)
+	void UseItem();
 };
