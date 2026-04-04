@@ -17,7 +17,6 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	flipBookComponent = GetSprite();
-
 	flipBookComponent->SetLooping(true);
 
 	inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
@@ -214,5 +213,6 @@ void APlayerCharacter::UseItem()
 	AAInteractionItem* itemToUse;
 	itemToUse = inventory->GetItemByIndex(currentItemIndex);
 
-	itemToUse->Execute();
+	if(itemToUse)
+		itemToUse->Execute();
 }
