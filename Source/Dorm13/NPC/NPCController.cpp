@@ -6,6 +6,7 @@
 #include "Dorm13/NPC_AI/WanderState.h"
 #include "Dorm13/NPC_AI/AttackState.h"
 #include "Dorm13//NPC_AI/WannaEat.h"
+#include "Dorm13/NPC_AI/EatingState.h"
 #include "BaseNPCCharacter.h"
 #include "Dorm13/InteractableObjects/InteractionItem.h"
 #include "Dorm13/player/PlayerCharacter.h"
@@ -41,17 +42,43 @@ void ANPCController::Tick(float deltaTime)
 		currentStrategy->Execute();
 
 	float newDistance = FMath::Abs(GetPawn()->GetActorLocation().X - player->GetActorLocation().X);
-	bool signChange;
-	if (isChasing)
-		signChange = distanceToPlayer < distToChace * 1.8f && distToChace * 1.8f < newDistance;
-	else
-		signChange = distanceToPlayer > distToChace && distToChace > newDistance;
+	bool signChange = false;
 
-	if (!signChange)
-		if (isAttacking)
-			signChange = distanceToPlayer < distanceToAttack && distanceToAttack < newDistance;
+	if (seeFood)
+	{ 
+		float newDistanceToFood = FMath::Abs(GetPawn()->GetActorLocation().X - food->GetActorLocation().X);
+		if (isEating)
+			signChange = distanceToFood < distanceToEat && distanceToEat < newDistanceToFood;
 		else
-			signChange = distanceToPlayer > distanceToAttack && distanceToAttack > newDistance;
+			signChange = distanceToFood > distanceToEat && distanceToEat > newDistanceToFood;
+
+		distanceToFood = newDistanceToFood;
+	}
+	else
+	{
+		if (food)
+		{ 
+			float newDistanceToFood = FMath::Abs(GetPawn()->GetActorLocation().X - food->GetActorLocation().X);
+			signChange = distanceToFood > distanceToSeeFood && distanceToSeeFood > newDistanceToFood;
+
+			distanceToFood = newDistanceToFood;
+
+			SeeFood();
+		}
+		if (!signChange)
+		{
+			if (isChasing)
+				signChange = distanceToPlayer < distToChace * 1.8f && distToChace * 1.8f < newDistance;
+			else
+				signChange = distanceToPlayer > distToChace && distToChace > newDistance;
+
+			if (!signChange)
+				if (isAttacking)
+					signChange = distanceToPlayer < distanceToAttack && distanceToAttack < newDistance;
+				else
+					signChange = distanceToPlayer > distanceToAttack && distanceToAttack > newDistance;
+		}
+	}
 
 	distanceToPlayer = newDistance;
 
@@ -60,7 +87,6 @@ void ANPCController::Tick(float deltaTime)
 		DecideWhichStrategyToUse();
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Current strategy is %f"), distanceToPlayer);
 	UE_LOG(LogTemp, Warning, TEXT("Current strategy is %s"), *currentStrategy->GetStateName());
 }
 
@@ -112,13 +138,24 @@ void ANPCController::DecideWhichStrategyToUse()
 
 	if (seeFood)
 	{
-		if (currentStrategy->GetStateName() != "wannaEat")
+		if (distanceToFood < distanceToEat)
 		{
-			SetStrategy(MakeUnique<WannaEat>(food));
-			tickStrategy = true;
-			isChasing = false;
-			isAttacking = false;
+			if (currentStrategy->GetStateName() != "eating")
+			{
+				SetStrategy(MakeUnique<EatingState>(food));
+				isEating = true;
+			}
 		}
+		else
+			if (currentStrategy->GetStateName() != "wannaEat")
+			{
+				SetStrategy(MakeUnique<WannaEat>(food));
+				isEating = false;
+			}
+		 
+		tickStrategy = true;
+		isChasing = false;
+		isAttacking = false;
 	}
 
 	else
@@ -161,10 +198,10 @@ void ANPCController::SeeFood()
 		TArray<AFood*> foodAll = Cast<APlayerCharacter>(player)->GetFood();
 		for (int i = 0; i < foodAll.Num(); i++)
 		{
-			distanceToFood = FMath::Abs(foodAll[i]->GetActorLocation().X - GetPawn()->GetActorLocation().X);
+			food = foodAll[i];
+			distanceToFood = FMath::Abs(food->GetActorLocation().X - GetPawn()->GetActorLocation().X);
 			if (distanceToFood < distanceToSeeFood)
 			{
-				food = foodAll[i];
 				seeFood = true;
 				DecideWhichStrategyToUse();
 				break;
@@ -183,6 +220,8 @@ void ANPCController::Eat()
 {
 	if (Cast<APlayerCharacter>(player) && Cast<AFood>(food))
 		Cast<APlayerCharacter>(player)->RemoveFoodFfromWorld(Cast<AFood>(food));
+
+	seeFood = false;
 }
 
 void ANPCController::ChooseCalmState()

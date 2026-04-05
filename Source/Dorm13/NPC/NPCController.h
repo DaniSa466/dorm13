@@ -24,11 +24,13 @@ private:
 	bool isChasing = false;
 	bool isAttacking = false;
 	bool seeFood = false;
+	bool isEating = false;
 	float distanceToPlayer;
 	float distanceToFood;
 	float distanceToSeeFood = 250.f;
 	float distToChace = 160.f;
 	float distanceToAttack = 75.f;
+	float distanceToEat = 50.f;
 	TUniquePtr<StrategyNPC> currentStrategy;
 	AActor* player = nullptr;
 	AActor* food = nullptr;
