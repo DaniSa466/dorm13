@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
-class AAInteractionItem;
+class IInteractableItem;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DORM13_API UInventoryComponent : public UActorComponent
@@ -19,7 +19,7 @@ public:
 
 protected:
 	int8 maxInventoryCount = 3;
-	TArray<class AAInteractionItem*> inventoryArray;
+	TArray<class IInteractableItem*> inventoryArray;
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -28,8 +28,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void AddItemToInventory(AAInteractionItem* itemToAdd);
-	AAInteractionItem* GetItemByIndex(int32 itemIndex);
+	void AddItemToInventory(IInteractableItem* itemToAdd);
+	void RemoveItemFromInventory(IInteractableItem* itemToRemove);
+	IInteractableItem* GetItemByIndex(int32 itemIndex);
 	
 	UFUNCTION(BlueprintCallable)
 	int32 GetInventoryLenght();

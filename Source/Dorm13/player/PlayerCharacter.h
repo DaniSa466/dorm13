@@ -10,7 +10,8 @@
 
 class UHealthComponent;
 class UInventoryComponent;
-class AInteractionActor;
+class IInteractableItem;
+class AAIntractableObject;
 
 UCLASS()
 class DORM13_API APlayerCharacter : public APaperCharacter
@@ -29,7 +30,7 @@ private:
 	FTimerHandle TimerHandle_StaminaDecrease;
 	FTimerHandle TimerHandle_StaminaRecovery;
 
-	class AAInteractionItem* itemToTake = nullptr;
+	class AAInteractableObject* objectToInteract = nullptr;
 
 	void InputAxisX(float value);
 	void MovementTick(float deltaSeconds);
@@ -55,8 +56,6 @@ protected:
 
 	void SprintEnabled();
 	void SprintDisabled();
-
-	void TakeItemToInventory();
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -88,6 +87,8 @@ public:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
 
+	void InteractWithObject();
+	void TakeItemToInventory();
 	UFUNCTION(BlueprintCallable)
 	void UseItem();
 

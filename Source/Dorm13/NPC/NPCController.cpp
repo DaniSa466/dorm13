@@ -52,6 +52,7 @@ void ANPCController::Tick(float deltaTime)
 		DecideWhichStrategyToUse();
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("Current strategy is %f"), distanceToPlayer);
 	UE_LOG(LogTemp, Warning, TEXT("Current strategy is %s"), *currentStrategy->GetStateName());
 }
 

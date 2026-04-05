@@ -5,38 +5,64 @@
 #include "Components/BoxComponent.h"
 #include "Dorm13/player/PlayerCharacter.h"
 
-AAInteractionItem::AAInteractionItem()
-{
-	itemName = NAME_None;
 
-	boxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision"));
-	boxCollision->SetupAttachment(RootComponent);
-
-	if (GetRenderComponent() && GetRenderComponent()->GetFlipbook())
-	{
-		FVector spriteSize = GetRenderComponent()->Bounds.BoxExtent;
-		boxCollision->SetBoxExtent(spriteSize);
-	}
-	else
-		boxCollision->SetBoxExtent(FVector(32.f, 32.f, 10.f));
-	boxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	boxCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	boxCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	boxCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
-}
 
 AEnergyDrink::AEnergyDrink()
 {
 	itemName = FName("Energy Drink");
 }
 
-void AEnergyDrink::SetCharPointer(AActor* actorToUseItem)
+void AEnergyDrink::Execute()
 {
-	pointerToChar = Cast<APlayerCharacter>(actorToUseItem);
+	if (pointerToChar)
+		pointerToChar->TakeItemToInventory();
 }
 
-void AEnergyDrink::Execute()
+void AEnergyDrink::UseItem()
 {
 	if (pointerToChar)
 		pointerToChar->IncreaseStamina(energyToRecovery);
 }
+
+void AFood::Move()
+{
+	FVector currentLocation = spawnedFood->GetActorLocation();
+	FVector newLocation = FVector(currentLocation.X + 5.f, 0.f, currentLocation.Z - 2.f);
+	spawnedFood->SetActorLocation(newLocation);
+
+	if (newLocation.Z <= minZ)
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_MoveTimer);
+}
+
+AFood::AFood()
+{
+	itemName = FName("Food");
+}
+
+void AFood::Execute()
+{
+	if (pointerToChar)
+		pointerToChar->TakeItemToInventory();
+}
+
+void AFood::UseItem()
+{
+	if (!pointerToChar)
+		return;
+
+	FVector spawnLocation = pointerToChar->GetActorLocation();
+	spawnLocation.X += 50;
+
+	FActorSpawnParameters spawnParams;
+	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	spawnParams.Owner = pointerToChar;
+	spawnParams.Instigator = pointerToChar;
+
+	if (GetWorld())
+	{
+		spawnedFood = Cast<AFood>(GetWorld()->SpawnActor(foodToSpawn, &spawnLocation, &FRotator::ZeroRotator, spawnParams));
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_MoveTimer, this, &AFood::Move, 0.1f, true);
+	}
+
+}
+

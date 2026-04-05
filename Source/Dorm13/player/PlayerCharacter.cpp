@@ -7,6 +7,7 @@
 #include "Dorm13/InteractableObjects/InteractionItem.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Dorm13/InteractableObjects/InteractableItem.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -138,17 +139,6 @@ void APlayerCharacter::SprintDisabled()
 	}
 }
 
-void APlayerCharacter::TakeItemToInventory()
-{
-	if (itemToTake && inventory->GetMaxInventoryLenght() > inventory->GetInventoryLenght())
-	{
-		if (AEnergyDrink* energyDrink = Cast<AEnergyDrink>(itemToTake))
-			energyDrink->SetCharPointer(this);
-		inventory->AddItemToInventory(itemToTake);
-		itemToTake->Destroy();
-	}
-}
-
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
@@ -166,7 +156,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction(TEXT("sprint"), EInputEvent::IE_Pressed, this, &APlayerCharacter::SprintEnabled);
 	PlayerInputComponent->BindAction(TEXT("sprint"), EInputEvent::IE_Released, this, &APlayerCharacter::SprintDisabled);
-	PlayerInputComponent->BindAction(TEXT("takeItem"), EInputEvent::IE_Released, this, &APlayerCharacter::TakeItemToInventory);
+	PlayerInputComponent->BindAction(TEXT("takeItem"), EInputEvent::IE_Released, this, &APlayerCharacter::InteractWithObject);
 	PlayerInputComponent->BindAction(TEXT("useItem"), EInputEvent::IE_Released, this, &APlayerCharacter::UseItem);
 }
 
@@ -197,7 +187,7 @@ void APlayerCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	itemToTake = Cast<AAInteractionItem>(OtherActor);
+	objectToInteract = Cast<AAInteractableObject>(OtherActor);
 }
 
 void APlayerCharacter::OnEndOverlap(UPrimitiveComponent* OverlappedComponent,
@@ -205,16 +195,41 @@ void APlayerCharacter::OnEndOverlap(UPrimitiveComponent* OverlappedComponent,
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex)
 {
-	itemToTake = nullptr;
+	objectToInteract = nullptr;
+}
+
+void APlayerCharacter::InteractWithObject()
+{
+	if (objectToInteract)
+	{
+		objectToInteract->SetPointerToChar(this);
+		objectToInteract->Execute();
+	}
+}
+
+void APlayerCharacter::TakeItemToInventory()
+{
+	if (objectToInteract)
+	{
+		IInteractableItem* itemToTake = Cast<IInteractableItem>(objectToInteract);
+		if (itemToTake && inventory->GetMaxInventoryLenght() > inventory->GetInventoryLenght())
+		{
+			inventory->AddItemToInventory(itemToTake);
+		}
+		objectToInteract->Destroy();
+	}
 }
 
 void APlayerCharacter::UseItem()
 {
-	AAInteractionItem* itemToUse;
+	IInteractableItem* itemToUse;
 	itemToUse = inventory->GetItemByIndex(currentItemIndex);
 
-	if(itemToUse)
-		itemToUse->Execute();
+	if (itemToUse)
+	{
+		itemToUse->UseItem();
+		inventory->RemoveItemFromInventory(itemToUse);
+	}
 }
 
 void APlayerCharacter::DecreaseHealth()

@@ -3,7 +3,7 @@
 
 #include "InventoryComponent.h"
 #include "Dorm13//player/PlayerCharacter.h"
-#include "Dorm13/InteractableObjects/InteractionItem.h"
+#include "Dorm13/InteractableObjects/InteractableItem.h"
 
 
 // Sets default values for this component's properties
@@ -35,14 +35,22 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
-void UInventoryComponent::AddItemToInventory(AAInteractionItem* itemToAdd)
+void UInventoryComponent::AddItemToInventory(IInteractableItem* itemToAdd)
 {
 	inventoryArray.Add(itemToAdd);
  }
 
-AAInteractionItem* UInventoryComponent::GetItemByIndex(int32 itemIndex)
+void UInventoryComponent::RemoveItemFromInventory(IInteractableItem* itemToRemove)
 {
-	return inventoryArray[itemIndex];
+	inventoryArray.Remove(itemToRemove);
+}
+
+IInteractableItem* UInventoryComponent::GetItemByIndex(int32 itemIndex)
+{
+	if (inventoryArray.IsValidIndex(itemIndex) && inventoryArray[itemIndex])
+		return inventoryArray[itemIndex];
+
+	return nullptr;
 }
 
 int32 UInventoryComponent::GetInventoryLenght()
