@@ -8,10 +8,13 @@
 #include "PaperFlipBook.h"
 #include "PlayerCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFoodThroughted);
+
 class UHealthComponent;
 class UInventoryComponent;
 class IInteractableItem;
 class AAIntractableObject;
+class AFood;
 
 UCLASS()
 class DORM13_API APlayerCharacter : public APaperCharacter
@@ -39,6 +42,8 @@ private:
 	void RecoveryStamina();
 
 protected:
+	TArray<class AFood*> foodInWorld;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
 	UPaperFlipbook* idleAnimation;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
@@ -58,6 +63,9 @@ protected:
 	void SprintDisabled();
 
 public:
+	UPROPERTY()
+	FOnFoodThroughted OnFoodThroughted;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* healthComponent;
 
@@ -92,5 +100,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UseItem();
 
+	void ThroughtFood();
 	void DecreaseHealth();
+
+	void AddFoodToWorld(AFood* food);
+	void RemoveFoodFfromWorld(AFood* food);
+	TArray<AFood*> GetFood();
 };

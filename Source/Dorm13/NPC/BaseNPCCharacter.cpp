@@ -62,6 +62,10 @@ UPaperFlipbook* ABaseNPCCharacter::GetAnimToPlay(FString stateName)
 		return wanderAnimation;
 	else if (stateName == "attack")
 		return hitAnimation;
+	else if (stateName == "wannaEat")
+		return chaseAnimation; // change to run
+	else if (stateName == "eating")
+		return eatAnimation;
 	else
 		return nullptr;
 }
@@ -74,15 +78,20 @@ void ABaseNPCCharacter::MoveActor(float move)
 	float directionX = (move > 0) ? 1.f : -1.f;
 	direction = FVector(directionX, 0.f, 0.f);
 
-	if (directionX > 0)
-		flipBookComponent->SetWorldRotation(FRotator(0.f, 180.f, 0.f));
-	else
-		flipBookComponent->SetWorldRotation(FRotator(0.f, 0.f, 0.f));
+	SetRotation(directionX > 0);
 }
 
 bool ABaseNPCCharacter::CheckCanMove(float moveSide)
 {
 	return FMath::Abs(GetActorLocation().X - baseLocation.X + moveSide) < maxDeviation;
+}
+
+void ABaseNPCCharacter::SetRotation(bool right)
+{
+	if (right)
+		flipBookComponent->SetWorldRotation(FRotator(0.f, 180.f, 0.f));
+	else
+		flipBookComponent->SetWorldRotation(FRotator(0.f, 0.f, 0.f));
 }
 
 void ABaseNPCCharacter::UnsetDestination()

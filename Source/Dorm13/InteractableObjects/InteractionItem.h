@@ -34,6 +34,7 @@ private:
 	AFood* spawnedFood;
 	FTimerHandle TimerHandle_MoveTimer;
 
+	void StartMoving();
 	void Move();
 
 protected:

@@ -232,6 +232,12 @@ void APlayerCharacter::UseItem()
 	}
 }
 
+void APlayerCharacter::ThroughtFood()
+{
+	UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter:: throught food"));
+	OnFoodThroughted.Broadcast();
+}
+
 void APlayerCharacter::DecreaseHealth()
 {
 	healthComponent->MinusHeart();
@@ -239,3 +245,19 @@ void APlayerCharacter::DecreaseHealth()
 	if (healthComponent->GetHearts() <= 0)
 		Death();
 }
+
+void APlayerCharacter::AddFoodToWorld(AFood* food)
+{
+	foodInWorld.Add(food);
+}
+
+void APlayerCharacter::RemoveFoodFfromWorld(AFood* food)
+{
+	foodInWorld.Remove(food);
+}
+
+TArray<AFood*> APlayerCharacter::GetFood()
+{
+	return foodInWorld;
+}
+

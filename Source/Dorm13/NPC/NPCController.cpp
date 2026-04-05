@@ -5,7 +5,10 @@
 #include "Dorm13/NPC_AI/ChaseState.h"
 #include "Dorm13/NPC_AI/WanderState.h"
 #include "Dorm13/NPC_AI/AttackState.h"
+#include "Dorm13//NPC_AI/WannaEat.h"
 #include "BaseNPCCharacter.h"
+#include "Dorm13/InteractableObjects/InteractionItem.h"
+#include "Dorm13/player/PlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 ANPCController::ANPCController()
@@ -21,6 +24,11 @@ void ANPCController::BeginPlay()
 	SetStrategy(MakeUnique<IdleState>());	
 	ChooseCalmState();
 	player = UGameplayStatics::GetPlayerPawn(this, 0);
+
+	if (Cast<APlayerCharacter>(player))
+	{
+		Cast<APlayerCharacter>(player)->OnFoodThroughted.AddDynamic(this, &ANPCController::SeeFood);
+	}
 
 	distanceToPlayer = FMath::Abs(GetPawn()->GetActorLocation().X - player->GetActorLocation().X);
 }
@@ -84,6 +92,12 @@ void ANPCController::SetStrategy(TUniquePtr<StrategyNPC> newStrategy)
 				{
 					GetWorld()->GetTimerManager().ClearTimer(TimerHandle_AttackTimer);
 				}
+
+				//eating timer
+				if (currentStrategy->GetStateName() == "eating")
+				{
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle_EatTimer, this, &ANPCController::Eat, 4.f, false);
+				}
 			}
 		}
 		else
@@ -96,32 +110,66 @@ void ANPCController::DecideWhichStrategyToUse()
 	if (!GetPawn() || !player)
 		return;
 
-	if (distanceToPlayer < distToChace)
+	if (seeFood)
 	{
-		isChasing = true;
-		if (distanceToPlayer < distanceToAttack)
+		if (currentStrategy->GetStateName() != "wannaEat")
 		{
-			if (currentStrategy->GetStateName() != "attack")
+			SetStrategy(MakeUnique<WannaEat>(food));
+			tickStrategy = true;
+			isChasing = false;
+			isAttacking = false;
+		}
+	}
+
+	else
+	{
+		if (distanceToPlayer < distToChace)
+		{
+			isChasing = true;
+			if (distanceToPlayer < distanceToAttack)
 			{
-				SetStrategy(MakeUnique<AttackState>(player));
-				tickStrategy = false;
-				isAttacking = true;
+				if (currentStrategy->GetStateName() != "attack")
+				{
+					SetStrategy(MakeUnique<AttackState>(player));
+					tickStrategy = false;
+					isAttacking = true;
+				}
+			}
+			else
+			{
+				if (currentStrategy->GetStateName() != "chase")
+				{
+					SetStrategy(MakeUnique<ChaseState>(player));
+					tickStrategy = true;
+					isAttacking = false;
+				}
 			}
 		}
 		else
 		{
-			if (currentStrategy->GetStateName() != "chase")
-			{
-				SetStrategy(MakeUnique<ChaseState>(player));
-				tickStrategy = true;
-				isAttacking = false;
-			}
+			tickStrategy = false;
+			ChooseCalmState();
 		}
 	}
-	else
+}
+
+void ANPCController::SeeFood()
+{
+	UE_LOG(LogTemp, Warning, TEXT("NPCController::SeeFood called"));
+	if (Cast<APlayerCharacter>(player))
 	{
-		tickStrategy = false;
-		ChooseCalmState();
+		TArray<AFood*> foodAll = Cast<APlayerCharacter>(player)->GetFood();
+		for (int i = 0; i < foodAll.Num(); i++)
+		{
+			distanceToFood = FMath::Abs(foodAll[i]->GetActorLocation().X - GetPawn()->GetActorLocation().X);
+			if (distanceToFood < distanceToSeeFood)
+			{
+				food = foodAll[i];
+				seeFood = true;
+				DecideWhichStrategyToUse();
+				break;
+			}
+		}
 	}
 }
 
@@ -129,6 +177,12 @@ void ANPCController::Attack()
 {
 	if (currentStrategy->GetStateName() == "attack")
 		currentStrategy->Execute();
+}
+
+void ANPCController::Eat()
+{
+	if (Cast<APlayerCharacter>(player) && Cast<AFood>(food))
+		Cast<APlayerCharacter>(player)->RemoveFoodFfromWorld(Cast<AFood>(food));
 }
 
 void ANPCController::ChooseCalmState()

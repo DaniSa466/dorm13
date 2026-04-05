@@ -24,11 +24,19 @@ void AEnergyDrink::UseItem()
 		pointerToChar->IncreaseStamina(energyToRecovery);
 }
 
+void AFood::StartMoving()
+{
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_MoveTimer, this, &AFood::Move, 0.1f, true);
+	}
+}
+
 void AFood::Move()
 {
-	FVector currentLocation = spawnedFood->GetActorLocation();
+	FVector currentLocation = GetActorLocation();
 	FVector newLocation = FVector(currentLocation.X + 5.f, 0.f, currentLocation.Z - 2.f);
-	spawnedFood->SetActorLocation(newLocation);
+	SetActorLocation(newLocation);
 
 	if (newLocation.Z <= minZ)
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_MoveTimer);
@@ -61,7 +69,14 @@ void AFood::UseItem()
 	if (GetWorld())
 	{
 		spawnedFood = Cast<AFood>(GetWorld()->SpawnActor(foodToSpawn, &spawnLocation, &FRotator::ZeroRotator, spawnParams));
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_MoveTimer, this, &AFood::Move, 0.1f, true);
+		
+		if (spawnedFood)
+		{
+			pointerToChar->AddFoodToWorld(spawnedFood);
+			spawnedFood->SetPointerToChar(pointerToChar);
+			spawnedFood->StartMoving();
+			pointerToChar->ThroughtFood();
+		}
 	}
 
 }

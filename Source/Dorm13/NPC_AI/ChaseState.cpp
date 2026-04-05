@@ -19,6 +19,7 @@ void ChaseState::Execute()
 	npc->UnsetDestination();
 
 	npc->GetCharacterMovement()->MaxWalkSpeed = 350.f;
+	npc->SetRotation(direction > 0);
 	npc->AddMovementInput(FVector(direction, 0.f, 0.f).GetSafeNormal(), 1.f);
 	npc->PlayAnim(animToPlay);
 }

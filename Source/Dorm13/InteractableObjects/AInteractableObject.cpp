@@ -13,6 +13,9 @@ AAInteractableObject::AAInteractableObject()
 	boxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision"));
 	boxCollision->SetupAttachment(RootComponent);
 
+	sprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("Sprite"));
+	sprite->SetupAttachment(RootComponent);
+
 	if (GetRenderComponent() && GetRenderComponent()->GetFlipbook())
 	{
 		FVector spriteSize = GetRenderComponent()->Bounds.BoxExtent;

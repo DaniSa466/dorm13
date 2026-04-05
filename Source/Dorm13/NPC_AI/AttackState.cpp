@@ -9,6 +9,7 @@ AttackState::AttackState(AActor* targetActor) : target(targetActor) {}
 
 void AttackState::Execute()
 {
+
 	APlayerCharacter* player = Cast<APlayerCharacter>(target);
 	if (player)
 	{

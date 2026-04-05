@@ -35,6 +35,8 @@ protected:
 	UPaperFlipbook* wanderAnimation;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UPaperFlipbook* hitAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UPaperFlipbook* eatAnimation;
 
 	virtual void BeginPlay() override;
 
@@ -48,6 +50,7 @@ public:
 	UPaperFlipbook* GetAnimToPlay(FString stateName);
 	void MoveActor(float move);
 	bool CheckCanMove(float moveSide);
+	void SetRotation(bool right);
 	void UnsetDestination();
 
 

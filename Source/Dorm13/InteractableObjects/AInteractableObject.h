@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PaperFlipbookActor.h"
+#include "PaperSpriteComponent.h"
 #include "AInteractableObject.generated.h"
 
 class AlayerCharacter;
@@ -21,6 +22,8 @@ protected:
 	FName itemName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	class UBoxComponent* boxCollision;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sprite")
+	UPaperSpriteComponent* sprite;
 	UPROPERTY()
 	class APlayerCharacter* pointerToChar = nullptr;
 

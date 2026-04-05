@@ -23,20 +23,28 @@ private:
 	bool tickStrategy = false;
 	bool isChasing = false;
 	bool isAttacking = false;
+	bool seeFood = false;
 	float distanceToPlayer;
+	float distanceToFood;
+	float distanceToSeeFood = 250.f;
 	float distToChace = 160.f;
 	float distanceToAttack = 75.f;
 	TUniquePtr<StrategyNPC> currentStrategy;
 	AActor* player = nullptr;
+	AActor* food = nullptr;
 
 	FTimerHandle TimerHandle_CalmStateTimer;
 	FTimerHandle TimerHandle_AttackTimer;
 	FTimerHandle TimerHandle_WaitTimer;
+	FTimerHandle TimerHandle_EatTimer;
 
 	void SetStrategy(TUniquePtr<StrategyNPC> newStrategy);
 	void DecideWhichStrategyToUse();
 
+	UFUNCTION()
+	void SeeFood();
 	void Attack();
+	void Eat();
 
 public:
 	void ChooseCalmState();
