@@ -2,7 +2,7 @@
 
 
 #include "IdleState.h"
-#include "Dorm13/NPC/BaseNPCCharacter1.h"
+#include "Dorm13/NPC/BaseNPCCharacter.h"
 #include "PaperFlipbook.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -12,7 +12,7 @@ IdleState::IdleState()
 
 void IdleState::Execute()
 {
-	//npc->GetCharacterMovement()->MaxWalkSpeed = 0.f;
+	npc->GetCharacterMovement()->MaxWalkSpeed = 0.f;
 	animToPlay = npc->GetAnimToPlay(GetStateName());
 	npc->PlayAnim(animToPlay);
 }

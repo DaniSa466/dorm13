@@ -90,4 +90,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UseItem();
+
+	void DecreaseHealth();
 };

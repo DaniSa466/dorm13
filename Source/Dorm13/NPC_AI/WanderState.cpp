@@ -2,7 +2,7 @@
 
 
 #include "WanderState.h"
-#include "Dorm13/NPC/BaseNPCCharacter1.h"
+#include "Dorm13/NPC/BaseNPCCharacter.h"
 #include "Dorm13/NPC/NPCController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -17,7 +17,7 @@ void WanderState::Execute()
 	else
 		axisX = 1.f;
 
-	npc->GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	npc->GetCharacterMovement()->MaxWalkSpeed = 200.f;
 	animToPlay = npc->GetAnimToPlay(GetStateName());
 	npc->OnDestinationReached.BindRaw(this, &WanderState::DestinationReached);
 
@@ -26,13 +26,14 @@ void WanderState::Execute()
 	else
 		npc->MoveActor(moveSize * (-axisX));
 
-	npc->SetRotation(axisX);
 	npc->PlayAnim(animToPlay);
 }
 
 void WanderState::DestinationReached()
 {
 	npc->OnDestinationReached.Unbind();
-	npc->GetController<ANPCController>()->ChooseCalmState();
+	npc->GetController<ANPCController>()->Wait(0.5f);
+
+	UE_LOG(LogTemp, Warning, TEXT("Destination point is reched"));
 }
 

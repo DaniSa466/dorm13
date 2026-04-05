@@ -7,7 +7,7 @@
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
 #include "NPCController.h"
-#include "BaseNPCCharacter1.generated.h"
+#include "BaseNPCCharacter.generated.h"
 
 DECLARE_DELEGATE(FOnDestinationReached);
 
@@ -24,6 +24,7 @@ private:
 	FVector baseLocation;
 	float maxDeviation = 300.f;
 	FVector destination = FVector(0.f, 300.f, 0.f);
+	FVector direction;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
@@ -32,6 +33,8 @@ protected:
 	UPaperFlipbook* chaseAnimation;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UPaperFlipbook* wanderAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UPaperFlipbook* hitAnimation;
 
 	virtual void BeginPlay() override;
 
@@ -41,10 +44,12 @@ public:
 	ABaseNPCCharacter();
 
 	void PlayAnim(UPaperFlipbook* anim);
-	void SetRotation(float side);
+	void PlayAnimOnce(UPaperFlipbook* anim);
 	UPaperFlipbook* GetAnimToPlay(FString stateName);
 	void MoveActor(float move);
 	bool CheckCanMove(float moveSide);
+	void UnsetDestination();
+
 
 	FOnDestinationReached OnDestinationReached;
 };

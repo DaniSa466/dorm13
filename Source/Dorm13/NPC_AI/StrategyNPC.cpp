@@ -2,7 +2,7 @@
 
 
 #include "StrategyNPC.h"
-#include "Dorm13/NPC/BaseNPCCharacter1.h"
+#include "Dorm13/NPC/BaseNPCCharacter.h"
 
 StrategyNPC::StrategyNPC()
 {

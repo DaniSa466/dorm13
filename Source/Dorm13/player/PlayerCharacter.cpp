@@ -216,3 +216,11 @@ void APlayerCharacter::UseItem()
 	if(itemToUse)
 		itemToUse->Execute();
 }
+
+void APlayerCharacter::DecreaseHealth()
+{
+	healthComponent->MinusHeart();
+
+	if (healthComponent->GetHearts() <= 0)
+		Death();
+}

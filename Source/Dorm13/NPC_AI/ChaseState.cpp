@@ -2,7 +2,7 @@
 
 
 #include "ChaseState.h"
-#include "Dorm13/NPC/BaseNPCCharacter1.h"
+#include "Dorm13/NPC/BaseNPCCharacter.h"
 #include "PaperFlipbook.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -16,8 +16,9 @@ void ChaseState::Execute()
 	float direction = targetActor->GetActorLocation().X - npc->GetActorLocation().X;
 
 	animToPlay = npc->GetAnimToPlay(GetStateName());
+	npc->UnsetDestination();
 
-	npc->GetCharacterMovement()->MaxWalkSpeed = 400.f;
+	npc->GetCharacterMovement()->MaxWalkSpeed = 350.f;
 	npc->AddMovementInput(FVector(direction, 0.f, 0.f).GetSafeNormal(), 1.f);
 	npc->PlayAnim(animToPlay);
 }
